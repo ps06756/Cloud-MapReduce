@@ -36,6 +36,27 @@ this file using ,
 ``` hadoop dfs -cat output_directory/part-r-00000```
 
 
+# MR Based Twitter Anaysis
 
+To compile the project, use maven
 
+``` mvn compile ```
+
+After that to create a jar file, which will run on hadoop cluster,
+
+``` jar cvf $HOME/twitter.jar -C /path/to/target/classes .```
+
+To run twitter analysis, you need a file containing tweets in the format `tweet_number: tweet text` on each line. The file should be placed inside the `tweets_input` directory in HDFS.
+
+``` hadoop jar $HOME/twitter.jar TwitterIndex tweets_input tweets_output```
+
+This will produce a file `part-r-00000` inside `tweets_output` directory. Copy this file to a directory `CosineInput`in HDFS.
+
+``` hadoop dfs -cp tweets_output/part-r-00000 CosineInput/```
+
+After that run the jar again on cluster, using:
+
+``` hadoop jar $HOME/twitter.jar CosineSimilarity CosineInput/ CosineOutput/```
+
+This will create a file `part-r-00000` inside the directory `CosineOutput` which contains the pair of tweets with ore than 90% similarity, which is the desired result.
 
